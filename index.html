@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Budget-Profit Identifier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="Stylesheet/style.css" rel="stylesheet">
+  <style>
+    .icon-svg {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      vertical-align: -0.125em;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+    .icon-img {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      vertical-align: -0.125em;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- Top Navbar -->
+  <div class="top_navbar">
+    <div class="hamburger" onclick="toggleSidebar()">
+      <div class="one"></div>
+      <div class="two"></div>
+      <div class="three"></div>
+    </div>
+    <div class="top_menu">
+      <div class="logo">Budget-Profit Identifier</div>
+      <ul>
+        <li class="dropdown-wrapper">
+          <a href="#" onclick="toggleProductDropdown(event)">
+            <img src="Image/chevron-down.svg" class="icon-img" alt="chevron-down">
+          </a>
+          <span class="menu_title">Available Products</span>
+          <div class="product-dropdown" id="productDropdown">
+            <div class="dropdown-search">
+              <img src="Image/magnifying-glass.svg" class="icon-img" alt="magnifying-glass">
+              <input type="text" id="productSearch" placeholder="Search products..." oninput="filterProducts(this.value)">
+            </div>
+            <ul class="dropdown-list" id="productList"></ul>
+            <p class="dropdown-empty" id="dropdownEmpty">No products found.</p>
+          </div>
+        </li>
+        <li>
+          <a href="#" onclick="newProduct(event)">
+            <img src="Image/circle-plus.svg" class="icon-img" alt="circle-plus">
+          </a>
+          <span class="menu_title">Add Product</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <ul>
+      <li><a class="active" href="#product" onclick="setActive(this)">
+        <span class="icon"><img src="Image/box.svg" class="icon-img" alt="box"></span>
+        <span class="title">Product</span>
+      </a></li>
+      <li><a href="#ingredients" onclick="setActive(this)">
+        <span class="icon"><img src="Image/seedling.svg" class="icon-img" alt="seedling"></span>
+        <span class="title">Ingredients</span>
+      </a></li>
+      <li><a href="#items" onclick="setActive(this)">
+        <span class="icon"><img src="Image/tags.svg" class="icon-img" alt="tags"></span>
+        <span class="title">Items</span>
+      </a></li>
+      <li><a href="#OpExp" onclick="setActive(this)">
+        <span class="icon"><img src="Image/receipt.svg" class="icon-img" alt="receipt"></span>
+        <span class="title">Operating Expenses</span>
+      </a></li>
+      <li><a href="#summary" onclick="setActive(this)">
+        <span class="icon"><img src="Image/chart-pie.svg" class="icon-img" alt="chart-pie"></span>
+        <span class="title">Summary</span>
+      </a></li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main_container" id="mainContainer">
+
+    <!-- PRODUCT SECTION -->
+    <section id="product">
+
+      <div class="p-text">
+        <div><p class="options" contenteditable="true">Product Name</p></div>
+        <div class="p-button">
+          <button id="editBtn" onclick="enableEdit()">
+            <img src="Image/pen.svg" class="icon-img" alt="pen"> Edit
+          </button>
+          <button id="saveBtn" class="btn-save" onclick="saveProduct()" style="display:none">
+            <img src="Image/floppy-disk.svg" class="icon-img" alt="floppy-disk"> Save
+          </button>
+        </div>
+      </div>
+
+      <div class="Product-container">
+
+        <div class="Product-content">
+          <div class="Product-profile">
+
+            <div class="product-image-wrapper">
+              <div class="product-image" onclick="document.getElementById('imageInput').click()">
+                <img src="https://placehold.co/200x200/e8f5e9/1e8a57?text=Click+to+Upload" id="preview" alt="Product Image">
+                <div class="image-overlay">
+                  <img src="Image/camera.svg" class="icon-img" alt="camera">
+                  <span>Change Photo</span>
+                </div>
+              </div>
+              <input type="file" id="imageInput" accept="image/*" style="display:none;">
+            </div>
+
+            <div class="form-row">
+              <div class="form-group checkbox-group">
+                <label for="VAT">VAT-Registered?</label>
+                <input type="checkbox" id="VAT" name="VAT" onchange="toggleVatRate(this)">
+              </div>
+              <div class="form-group">
+                <label for="VAT_RATE">VAT %</label>
+                <input type="number" id="VAT_RATE" name="VAT_RATE" placeholder="0" min="0" max="100" disabled>
+              </div>
+              <div class="form-group">
+                <label for="BATCH">Batch Size</label>
+                <input type="number" id="BATCH" name="BATCH" placeholder="0" min="0">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="MARGIN">Target Margin (%)</label>
+              <input type="number" id="MARGIN" name="MARGIN" placeholder="0" min="0" max="100">
+            </div>
+
+            <div class="summary-block">
+              <h3>Per Batch</h3>
+              <div class="summary-row"><span>Batch subtotal (ingredients)</span><span class="val" id="batchIngTotal">₱0.00</span></div>
+              <div class="summary-row"><span>Batch other costs (items)</span><span class="val" id="batchItemsTotal">₱0.00</span></div>
+              <div class="summary-row total"><span>Batch total cost</span><span class="val" id="batchTotalCost">₱0.00</span></div>
+            </div>
+
+            <div class="summary-block">
+              <h3>Per Order</h3>
+              <div class="summary-row"><span>Subtotal (ingredients)</span><span class="val" id="orderIngTotal">₱0.00</span></div>
+              <div class="summary-row"><span>Other costs (items)</span><span class="val" id="orderItemsTotal">₱0.00</span></div>
+              <div class="summary-row"><span>Total cost</span><span class="val" id="orderTotalCost">₱0.00</span></div>
+              <div class="summary-row"><span>Price before VAT</span><span class="val" id="orderPriceBeforeVat">₱0.00</span></div>
+              <div class="summary-row"><span>VAT</span><span class="val" id="orderVat">₱0.00</span></div>
+              <div class="summary-row"><span>Regular selling price</span><span class="val" id="orderSellingPrice">₱0.00</span></div>
+              <div class="summary-row total"><span>Profit per order</span><span class="val profit" id="orderProfit">₱0.00</span></div>
+            </div>
+
+            <div class="summary-block">
+              <h3>With Discount</h3>
+              <p class="note">PWD/Senior discount %</p>
+              <div class="summary-row">
+                <span>Discount %</span>
+                <span class="val"><input type="number" id="DISCOUNT_RATE" value="20" min="0" max="100" class="inline-rate-input"> %</span>
+              </div>
+              <div class="summary-row"><span>Discount</span><span class="val" id="discountAmount">₱0.00</span></div>
+              <div class="summary-row"><span>Discounted price</span><span class="val" id="discountedPrice">₱0.00</span></div>
+              <div class="summary-row"><span>Profit (after discount)</span><span class="val" id="discountProfit">₱0.00</span></div>
+              <div class="summary-row total"><span>Profit difference (vs regular)</span><span class="val loss" id="discountProfitDiff">₱0.00</span></div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="Product-tables">
+
+          <div class="Product-recipe">
+            <h4><img src="Image/seedling.svg" class="icon-img" alt="seedling"> Ingredients</h4>
+            <div class="table-scroll">
+              <table id="productIngTable" border="1">
+                <thead><tr><th>Ingredients</th><th>Qty Needed</th><th>Unit</th><th>Unit Cost</th><th>Cost</th></tr></thead>
+                <tbody><tr><td></td><td></td><td></td><td></td><td></td></tr></tbody>
+              </table>
+            </div>
+            <div class="table-actions">
+              <button onclick="addProductRow('productIngTable')"><img src="Image/plus.svg" class="icon-img" alt="plus"> Add Row</button>
+              <button onclick="removeProductRow('productIngTable')"><img src="Image/minus.svg" class="icon-img" alt="minus"> Remove Row</button>
+            </div>
+          </div>
+
+          <div class="Product-items">
+            <h4><img src="Image/tags.svg" class="icon-img" alt="tags"> Items</h4>
+            <div class="table-scroll">
+              <table id="productItemsTable" border="1">
+                <thead><tr><th>Items</th><th>Qty Needed</th><th>Unit</th><th>Unit Cost</th><th>Cost</th></tr></thead>
+                <tbody><tr><td></td><td></td><td></td><td></td><td></td></tr></tbody>
+              </table>
+            </div>
+            <div class="table-actions">
+              <button onclick="addProductRow('productItemsTable')"><img src="Image/plus.svg" class="icon-img" alt="plus"> Add Row</button>
+              <button onclick="removeProductRow('productItemsTable')"><img src="Image/minus.svg" class="icon-img" alt="minus"> Remove Row</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- INGREDIENTS SECTION -->
+    <section id="ingredients">
+      <div class="section-header">
+        <h2><img src="Image/seedling.svg" class="icon-img" alt="seedling"> Ingredients</h2>
+      </div>
+      <div class="ingredients-table">
+        <div class="ingredients-list">
+          <div class="table-scroll">
+            <table id="ingredientTable">
+              <thead><tr><th>Ingredient</th><th>Supplier</th><th>Package Price</th><th>Qty per Pack</th><th>Shipping Fee</th><th>Unit</th><th>Unit Cost</th></tr></thead>
+              <tbody><tr><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td></tr></tbody>
+            </table>
+          </div>
+          <div class="table-actions">
+            <button onclick="addIngredients()"><img src="Image/plus.svg" class="icon-img" alt="plus"> Add Row</button>
+            <button onclick="removeIngredients()"><img src="Image/minus.svg" class="icon-img" alt="minus"> Remove Row</button>
+          </div>
+        </div>
+        <div class="unit-list">
+          <h4>Units of Measure</h4>
+          <div class="table-scroll">
+            <table id="typesOfunit">
+              <thead><tr><th>Unit</th></tr></thead>
+              <tbody><tr><td contenteditable="true"></td></tr></tbody>
+            </table>
+          </div>
+          <div class="table-actions">
+            <button onclick="addRow()"><img src="Image/plus.svg" class="icon-img" alt="plus"> Add Row</button>
+            <button onclick="removeRow()"><img src="Image/minus.svg" class="icon-img" alt="minus"> Remove Row</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ITEMS SECTION -->
+    <section id="items">
+      <div class="section-header">
+        <h2><img src="Image/tags.svg" class="icon-img" alt="tags"> Items</h2>
+      </div>
+      <div class="ingredients-table">
+        <div class="ingredients-list">
+          <div class="table-scroll">
+            <table id="itemsTable">
+              <thead><tr><th>Items</th><th>Supplier</th><th>Package Price</th><th>Qty per Pack</th><th>Shipping Fee</th><th>Unit</th><th>Unit Cost</th></tr></thead>
+              <tbody><tr><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td></tr></tbody>
+            </table>
+          </div>
+          <div class="table-actions">
+            <button onclick="addItems()"><img src="Image/plus.svg" class="icon-img" alt="plus"> Add Row</button>
+            <button onclick="removeItems()"><img src="Image/minus.svg" class="icon-img" alt="minus"> Remove Row</button>
+          </div>
+        </div>
+        <div class="unit-list">
+          <h4>Units of Measure</h4>
+          <div class="table-scroll">
+            <table id="itemsUnit">
+              <thead><tr><th>Unit</th></tr></thead>
+              <tbody><tr><td contenteditable="true"></td></tr></tbody>
+            </table>
+          </div>
+          <div class="table-actions">
+            <button onclick="addItemRow()"><img src="Image/plus.svg" class="icon-img" alt="plus"> Add Row</button>
+            <button onclick="removeItemRow()"><img src="Image/minus.svg" class="icon-img" alt="minus"> Remove Row</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- OPERATING EXPENSES SECTION -->
+    <section id="OpExp">
+      <div class="section-header">
+        <h2><img src="Image/receipt.svg" class="icon-img" alt="receipt"> Operating Expenses</h2>
+      </div>
+      <div class="ingredients-table">
+        <div class="ingredients-list">
+          <div class="table-scroll">
+            <table id="opexTable">
+              <thead><tr><th>Operating Expenses (OPEX)</th><th>Amount / Month</th></tr></thead>
+              <tbody><tr><td contenteditable="true"></td><td contenteditable="true"></td></tr></tbody>
+            </table>
+          </div>
+          <div class="table-actions">
+            <button onclick="addOpex()"><img src="Image/plus.svg" class="icon-img" alt="plus"> Add Row</button>
+            <button onclick="removeOpex()"><img src="Image/minus.svg" class="icon-img" alt="minus"> Remove Row</button>
+          </div>
+        </div>
+        <div class="unit-list">
+          <div class="opex-summary">
+            <div class="opex-inline-row">
+              <span class="opex-inline-label">Monthly OPEX Total</span>
+              <input type="text" id="monthlyOpex" placeholder="₱0.00" readonly class="opex-inline-input">
+            </div>
+            <div class="opex-inline-row">
+              <span class="opex-inline-label">Contingency Fund</span>
+              <input type="number" id="contingencyRate" value="5" min="0" max="100" class="contingency-rate-input">
+              <span class="opex-inline-unit">%</span>
+              <input type="text" id="contingency" placeholder="₱0.00" readonly class="opex-inline-input">
+            </div>
+            <p class="note">Extra money set aside (default 5% of total expenses) for unexpected costs.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUMMARY SECTION -->
+    <section id="summary">
+      <div class="section-header">
+        <h2><img src="Image/chart-pie.svg" class="icon-img" alt="chart-pie"> Summary</h2>
+      </div>
+      <div class="ingredients-table">
+        <div class="ingredients-list">
+          <div class="table-scroll">
+            <table id="summaryTable">
+              <thead>
+                <tr>
+                  <th>Recipe Name</th>
+                  <th>Selling Price</th>
+                  <th>Total Cost</th>
+                  <th>Profit/Order</th>
+                  <th>Orders/Month</th>
+                  <th>Revenue/Month</th>
+                  <th>Profit/Month</th>
+                  <th>Extra Orders for Breakeven</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td></td><td></td><td></td><td></td>
+                  <td></td><td></td><td></td><td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-actions">
+            <button onclick="addSummaryRow()"><img src="Image/plus.svg" class="icon-img" alt="plus"> Add Row</button>
+            <button onclick="removeSummaryRow()"><img src="Image/minus.svg" class="icon-img" alt="minus"> Remove Row</button>
+          </div>
+        </div>
+        <div class="unit-list">
+          <div class="summary-totals">
+            <div class="total-card">
+              <span class="total-label">Gross Revenue</span>
+              <span class="total-value" id="grossRevenue">₱0.00</span>
+            </div>
+            <div class="total-card">
+              <span class="total-label">Gross Profit</span>
+              <span class="total-value profit" id="grossProfit">₱0.00</span>
+            </div>
+            <div class="total-card">
+              <span class="total-label">Monthly OPEX</span>
+              <span class="total-value" id="summaryMonthlyOpex">₱0.00</span>
+            </div>
+            <div class="total-card highlight">
+              <span class="total-label">Net Profit</span>
+              <span class="total-value profit" id="netProfit">₱0.00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div class="modal-icon">
+      <img src="Image/trash-can.svg" class="icon-img" alt="trash-can">
+    </div>
+    <h3 class="modal-title">Delete Product?</h3>
+    <p class="modal-message">This will permanently delete <strong id="deleteProductName"></strong>. This action cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn-confirm-delete" onclick="confirmDelete()">
+        <img src="Image/trash-can.svg" class="icon-img" alt="trash-can"> Delete
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="javascript/script.js"></script>
+</body>
+</html>
